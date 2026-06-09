@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-st.title("Solar Cell Parameter Extraction Tool - 123")
+st.title("Solar Cell Parameter Extraction Tool")
 
 # Inputs
 Area = st.number_input("Area (cm²)", value=0.0078)
