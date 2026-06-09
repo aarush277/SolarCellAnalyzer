@@ -8,8 +8,11 @@ st.title("Solar Cell Parameter Extraction Tool")
 # Inputs
 Area = st.number_input(
     "Area (cm²)",
-    value=0.1234,
-    key="area_input_test"
+    min_value=0.0001,
+    value=0.0078,
+    step=0.0001,
+    format="%.4f",
+    key="area_input_final"
 )
 Astar = st.number_input("A*", value=120.0)
 T = st.number_input("Temperature (K)", value=300.0)
