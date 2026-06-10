@@ -195,6 +195,11 @@ if st.button("Run Cheung Part 2"):
 
         Phi_B = Intercept2 / n
 
+        # Reverse Saturation Current
+        VT = 0.02585   # kT/q at 300 K
+
+        Is = Area * Astar * (T**2) * np.exp(-Phi_B / VT)
+
         H_fit = np.polyval(
             p2,
             I_fit2
@@ -205,6 +210,7 @@ if st.button("Run Cheung Part 2"):
         st.write(f"### Rs (Part 2) = {Rs2:.4f} Ω")
         st.write(f"### Barrier Height = {Phi_B:.4f} eV")
         st.write(f"### Intercept = {Intercept2:.4f}")
+        st.write(f"### Reverse saturation current Is = {Is:.4e} A")
 
         # Plot
 
