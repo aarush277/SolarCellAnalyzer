@@ -16,6 +16,27 @@ Area = st.number_input(
 )
 Astar = st.number_input("A*", value=120.0)
 T = st.number_input("Temperature (K)", value=300.0)
+st.subheader("Nss Parameters")
+
+eps_i = st.number_input(
+    "Dielectric Constant of Interfacial Layer",
+    value=3.9
+)
+
+delta_nm = st.number_input(
+    "Interfacial Layer Thickness (nm)",
+    value=2.0
+)
+
+Wd_nm = st.number_input(
+    "Depletion Width (nm)",
+    value=20.0
+)
+
+eps_s = st.number_input(
+    "Dielectric Constant of Silicon",
+    value=11.9
+)
 
 uploaded_file = st.file_uploader(
     "Upload Excel File",
@@ -228,75 +249,6 @@ if st.button("Run Cheung Part 2"):
         st.session_state["n"] = n
         st.session_state["Area"] = Area
         st.session_state["T"] = T
-        # =====================================================
-        # VOLTAGE CONTROLLED IDEALITY FACTOR
-        # =====================================================
-
-        # Use complete forward bias region
-        mask_vcif = If > 0
-
-        Vf_fit = Vf[mask_vcif]
-        If_fit = If[mask_vcif]
-
-        # Avoid log(1) and negative values
-        ratio = If_fit / Is
-        valid = ratio > 1.05
-
-        Vf_fit = Vf_fit[valid]
-        If_fit = If_fit[valid]
-
-        # Voltage controlled ideality factor
-        nV = Vf_fit / ((k*T/q) * np.log(If_fit/Is))
-
-       # Remove invalid values
-        valid_nv = np.isfinite(nV) & (nV > 0)
-
-        nV = nV[valid_nv]
-        Vf_fit = Vf_fit[valid_nv]
-        If_fit = If_fit[valid_nv]
-
-        st.subheader("Voltage Controlled Ideality Factor")
-
-        st.write(f"Average n(V) = {np.mean(nV):.4f}")
-        st.write(f"Minimum n(V) = {np.min(nV):.4f}")
-        st.write(f"Maximum n(V) = {np.max(nV):.4f}")
-
-        fig_nv, ax_nv = plt.subplots(figsize=(8,5))
-        ax_nv.plot(Vf_fit, nV, linewidth=2)
-        ax_nv.set_xlabel("Voltage (V)")
-        ax_nv.set_ylabel("n(V)")
-        ax_nv.set_title("Voltage Controlled Ideality Factor")
-        ax_nv.grid(True)
-
-        st.pyplot(fig_nv)
-
-# =====================================================
-# EFFECTIVE BARRIER HEIGHT
-# =====================================================
-
-        Phi_eff = Phi_B + (1 - 1/nV) * (Vf_fit - If_fit*Rs1)
-
-        valid_phi = np.isfinite(Phi_eff)
-
-        Phi_eff = Phi_eff[valid_phi]
-        Vf_phi = Vf_fit[valid_phi]
-
-        st.subheader("Effective Barrier Height")
-
-        st.write(
-        f"Average Effective Barrier Height = "
-        f"{np.mean(Phi_eff):.4f} eV")
-
-        fig_phi, ax_phi = plt.subplots(figsize=(8,5))
-
-        ax_phi.plot(Vf_phi, Phi_eff, linewidth=2)
-
-        ax_phi.set_xlabel("Voltage (V)")
-        ax_phi.set_ylabel("Effective Barrier Height (eV)")
-        ax_phi.set_title("Effective Barrier Height")
-        ax_phi.grid(True)
-
-        st.pyplot(fig_phi)
 
         # Plot
 
@@ -441,3 +393,75 @@ if st.button("Effective Barrier Height"):
 
         st.session_state["Phi_eff"] = Phi_eff
         st.session_state["Vf_phi"] = Vf_phi
+
+        # =====================================================
+# INTERFACIAL STATE DENSITY (Nss)
+# =====================================================
+
+if st.button("Interfacial State Density (Nss)"):
+
+    if "nV" not in st.session_state:
+        st.error("Run Voltage Controlled Ideality Factor first")
+
+    elif "Phi_eff" not in st.session_state:
+        st.error("Run Effective Barrier Height first")
+
+    else:
+
+        q = 1.602e-19
+        eps0 = 8.854e-14   # F/cm
+
+        nV = st.session_state["nV"]
+        Phi_eff = st.session_state["Phi_eff"]
+        Vf_phi = st.session_state["Vf_phi"]
+
+        # Convert nm → cm
+        delta_cm = delta_nm * 1e-7
+        Wd_cm = Wd_nm * 1e-7
+
+        # Capacitance terms
+        Ci = eps_i * eps0 / delta_cm
+        Cd = eps_s * eps0 / Wd_cm
+
+        # Nss formula from paper
+        Nss = (Ci*(nV - 1) - Cd) / q
+
+        # Energy axis
+        q = 1.602e-19
+
+        Ess_minus_Ev = q * (Phi_eff - Vf_phi)
+
+        valid = np.isfinite(Nss)
+
+        Nss = Nss[valid]
+        Ess_minus_Ev = Ess_minus_Ev[valid]
+
+        st.subheader("Interfacial State Density")
+
+        st.write(
+            f"Maximum Nss = {np.max(Nss):.3e} cm⁻²eV⁻¹"
+        )
+
+        st.write(
+            f"Minimum Nss = {np.min(Nss):.3e} cm⁻²eV⁻¹"
+        )
+
+        st.write(
+            f"Average Nss = {np.mean(Nss):.3e} cm⁻²eV⁻¹"
+        )
+
+        fig_nss, ax_nss = plt.subplots(figsize=(8,5))
+
+        ax_nss.plot(
+            Ess_minus_Ev,
+            Nss,
+            linewidth=2
+        )
+
+        ax_nss.set_xlabel("Ess - Ev (eV)")
+        ax_nss.set_ylabel("Nss (cm⁻² eV⁻¹)")
+        ax_nss.set_title("Interfacial State Density")
+
+        ax_nss.grid(True)
+
+        st.pyplot(fig_nss)
