@@ -218,23 +218,28 @@ if st.button("Run Cheung Part 2"):
         st.write(f"### Barrier Height = {Phi_B:.4f} eV")
         st.write(f"### Intercept = {Intercept2:.4f}")
         st.write(f"### Reverse saturation current Is = {Is:.4e} A")
-        # =====================================
-# Voltage Controlled Ideality Factor
-# =====================================
+        # =====================================================
+        # VOLTAGE CONTROLLED IDEALITY FACTOR
+        # =====================================================
 
-        mask_vcif = If < 0.022
+        # Use complete forward bias region
+        mask_vcif = If > 0
+
         Vf_fit = Vf[mask_vcif]
         If_fit = If[mask_vcif]
 
-# Remove unstable points
+        # Avoid log(1) and negative values
         ratio = If_fit / Is
         valid = ratio > 1.05
 
         Vf_fit = Vf_fit[valid]
         If_fit = If_fit[valid]
 
+        # Voltage controlled ideality factor
         nV = Vf_fit / ((k*T/q) * np.log(If_fit/Is))
-        valid_nv = np.isfinite(nV) & (nV > 0) & (nV < 10)
+
+       # Remove invalid values
+        valid_nv = np.isfinite(nV) & (nV > 0)
 
         nV = nV[valid_nv]
         Vf_fit = Vf_fit[valid_nv]
@@ -243,49 +248,43 @@ if st.button("Run Cheung Part 2"):
         st.subheader("Voltage Controlled Ideality Factor")
 
         st.write(f"Average n(V) = {np.mean(nV):.4f}")
-        st.write(f"Minimum n(V) = {np.min(nV):.4f}")
-        st.write(f"Maximum n(V) = {np.max(nV):.4f}")
 
-        # =====================================
-# Effective Barrier Height
-# =====================================
+        fig_nv, ax_nv = plt.subplots(figsize=(8,5))
+        ax_nv.plot(Vf_fit, nV, linewidth=2)
+        ax_nv.set_xlabel("Voltage (V)")
+        ax_nv.set_ylabel("n(V)")
+        ax_nv.set_title("Voltage Controlled Ideality Factor")
+        ax_nv.grid(True)
 
-        Phi_eff = Phi_B + (1 - 1/nV)*(Vf_fit - If_fit*Rs1)
+        st.pyplot(fig_nv)
+
+# =====================================================
+# EFFECTIVE BARRIER HEIGHT
+# =====================================================
+
+        Phi_eff = Phi_B + (1 - 1/nV) * (Vf_fit - If_fit*Rs1)
+
+        valid_phi = np.isfinite(Phi_eff)
+
+        Phi_eff = Phi_eff[valid_phi]
+        Vf_phi = Vf_fit[valid_phi]
 
         st.subheader("Effective Barrier Height")
 
         st.write(
-        f"Average Effective Barrier Height = {np.mean(Phi_eff):.4f} eV")
+        f"Average Effective Barrier Height = "
+        f"{np.mean(Phi_eff):.4f} eV")
 
-        fig1, ax1 = plt.subplots(figsize=(8,5))
+        fig_phi, ax_phi = plt.subplots(figsize=(8,5))
 
-        ax1.plot(
-        Vf_fit,
-        nV,
-        linewidth=2)
+        ax_phi.plot(Vf_phi, Phi_eff, linewidth=2)
 
-        ax1.set_xlabel("Voltage (V)")
-        ax1.set_ylabel("n(V)")
-        ax1.set_title("Voltage Controlled Ideality Factor")
+        ax_phi.set_xlabel("Voltage (V)")
+        ax_phi.set_ylabel("Effective Barrier Height (eV)")
+        ax_phi.set_title("Effective Barrier Height")
+        ax_phi.grid(True)
 
-        ax1.grid(True)
-
-        st.pyplot(fig1)
-
-        fig2, ax2 = plt.subplots(figsize=(8,5))
-
-        ax2.plot(
-        Vf_fit,
-        Phi_eff,
-        linewidth=2)
-
-        ax2.set_xlabel("Voltage (V)")
-        ax2.set_ylabel("Effective Barrier Height (eV)")
-        ax2.set_title("Effective Barrier Height")
-
-        ax2.grid(True)
-
-        st.pyplot(fig2)
+        st.pyplot(fig_phi)
 
         # Plot
 
