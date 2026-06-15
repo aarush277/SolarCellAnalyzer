@@ -223,16 +223,21 @@ if st.button("Run Cheung Part 2"):
 # =====================================
 
         mask_vcif = If < 0.022
-
         Vf_fit = Vf[mask_vcif]
         If_fit = If[mask_vcif]
+
+# Remove unstable points
+        ratio = If_fit / Is
+        valid = ratio > 1.05
+
+        Vf_fit = Vf_fit[valid]
+        If_fit = If_fit[valid]
 
         nV = Vf_fit / ((k*T/q) * np.log(If_fit/Is))
 
         st.subheader("Voltage Controlled Ideality Factor")
 
-        st.write(
-        f"Average n(V) = {np.mean(nV):.4f}")
+        st.write(f"Average n(V) = {np.mean(nV):.4f}")
 
         # =====================================
 # Effective Barrier Height
