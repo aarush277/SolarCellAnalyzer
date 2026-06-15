@@ -219,6 +219,47 @@ if st.button("Run Cheung Part 2"):
         st.write(f"### Intercept = {Intercept2:.4f}")
         st.write(f"### Reverse saturation current Is = {Is:.4e} A")
 
+        # Voltage Controlled Ideality Factor
+
+        nV = Vf / ((k*T/q) * np.log(If/Io))
+
+        st.subheader("Voltage Controlled Ideality Factor")
+
+        st.write(
+        f"Average n(V) = {np.mean(nV):.4f}")
+
+        Phi_eff = Phi_B + (1 - 1/nV)*(Vf - If*Rs)
+
+        st.subheader("Effective Barrier Height")
+
+        st.write(
+        f"Average Φe = {np.mean(Phi_eff):.4f} eV")
+
+        fig1, ax1 = plt.subplots()
+
+        ax1.plot(Vf, nV)
+
+        ax1.set_xlabel("Voltage (V)")
+        ax1.set_ylabel("n(V)")
+        ax1.set_title("Voltage Controlled Ideality Factor")
+
+        ax1.grid(True)
+
+        st.pyplot(fig1)
+
+        fig2, ax2 = plt.subplots()
+
+        ax2.plot(Vf, Phi_eff)
+
+        ax2.set_xlabel("Voltage (V)")
+        ax2.set_ylabel("Φe (eV)")
+        ax2.set_title("Effective Barrier Height")
+
+        ax2.grid(True)
+
+        st.pyplot(fig2)
+                                     
+
         # Plot
 
         fig, ax = plt.subplots(figsize=(8,5))
