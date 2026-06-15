@@ -221,7 +221,7 @@ if st.button("Run Cheung Part 2"):
 
         # Voltage Controlled Ideality Factor
 
-        nV = Vf / ((k*T/q) * np.log(If/Io))
+        nV = Vf / ((k*T/q) * np.log(If/Is))
 
         st.subheader("Voltage Controlled Ideality Factor")
 
