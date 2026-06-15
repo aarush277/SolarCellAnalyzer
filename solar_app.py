@@ -227,7 +227,7 @@ if st.button("Run Cheung Part 2"):
         Vf_fit = Vf[mask_vcif]
         If_fit = If[mask_vcif]
 
-        nV = Vf_fit / ((k*T/q) * np.log(If_fit/Io))
+        nV = Vf_fit / ((k*T/q) * np.log(If_fit/Is))
 
         st.subheader("Voltage Controlled Ideality Factor")
 
@@ -254,8 +254,7 @@ if st.button("Run Cheung Part 2"):
 
         ax1.set_xlabel("Voltage (V)")
         ax1.set_ylabel("n(V)")
-        ax1.set_title(
-    "Voltage Controlled Ideality Factor")
+        ax1.set_title("Voltage Controlled Ideality Factor")
 
         ax1.grid(True)
 
