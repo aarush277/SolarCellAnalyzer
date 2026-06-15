@@ -238,7 +238,7 @@ if st.button("Run Cheung Part 2"):
 # Effective Barrier Height
 # =====================================
 
-        Phi_eff = Phi_B + (1 - 1/nV)*(Vf_fit - If_fit*Rs)
+        Phi_eff = Phi_B + (1 - 1/nV)*(Vf_fit - If_fit*Rs1)
 
         st.subheader("Effective Barrier Height")
 
