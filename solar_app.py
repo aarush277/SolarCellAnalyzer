@@ -222,7 +222,7 @@ if st.button("Run Cheung Part 2"):
 # Voltage Controlled Ideality Factor
 # =====================================
 
-        mask_vcif = If < 0.022
+        mask_vcif = (If > 0.001) & (If < 0.022)
         Vf_fit = Vf[mask_vcif]
         If_fit = If[mask_vcif]
 
@@ -234,6 +234,10 @@ if st.button("Run Cheung Part 2"):
         If_fit = If_fit[valid]
 
         nV = Vf_fit / ((k*T/q) * np.log(If_fit/Is))
+        valid_nv = (nV > 0) & (nV < 10)
+
+        nV = nV[valid_nv]
+        Vf_fit = Vf_fit[valid_nv]
 
         st.subheader("Voltage Controlled Ideality Factor")
 
