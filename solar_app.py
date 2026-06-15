@@ -218,6 +218,16 @@ if st.button("Run Cheung Part 2"):
         st.write(f"### Barrier Height = {Phi_B:.4f} eV")
         st.write(f"### Intercept = {Intercept2:.4f}")
         st.write(f"### Reverse saturation current Is = {Is:.4e} A")
+        # Save values for later use
+
+        st.session_state["Vf"] = Vf
+        st.session_state["If"] = If
+        st.session_state["Rs"] = Rs1
+        st.session_state["Phi_B"] = Phi_B
+        st.session_state["Is"] = Is
+        st.session_state["n"] = n
+        st.session_state["Area"] = Area
+        st.session_state["T"] = T
         # =====================================================
         # VOLTAGE CONTROLLED IDEALITY FACTOR
         # =====================================================
@@ -248,6 +258,8 @@ if st.button("Run Cheung Part 2"):
         st.subheader("Voltage Controlled Ideality Factor")
 
         st.write(f"Average n(V) = {np.mean(nV):.4f}")
+        st.write(f"Minimum n(V) = {np.min(nV):.4f}")
+        st.write(f"Maximum n(V) = {np.max(nV):.4f}")
 
         fig_nv, ax_nv = plt.subplots(figsize=(8,5))
         ax_nv.plot(Vf_fit, nV, linewidth=2)
@@ -314,3 +326,118 @@ if st.button("Run Cheung Part 2"):
         ax.legend()
 
         st.pyplot(fig)
+        # =====================================================
+# VOLTAGE CONTROLLED IDEALITY FACTOR
+# =====================================================
+
+if st.button("Voltage Controlled Ideality Factor"):
+
+    if "Vf" not in st.session_state:
+        st.error("Run Cheung Part 2 first")
+    else:
+
+        q = 1.602e-19
+        k = 1.381e-23
+
+        Vf = st.session_state["Vf"]
+        If = st.session_state["If"]
+        Is = st.session_state["Is"]
+        T = st.session_state["T"]
+
+        ratio = If / Is
+
+        valid = ratio > 1.05
+
+        Vf_plot = Vf[valid]
+        If_plot = If[valid]
+
+        nV = Vf_plot / (
+            (k*T/q) *
+            np.log(If_plot/Is)
+        )
+
+        valid2 = np.isfinite(nV) & (nV > 0)
+
+        nV = nV[valid2]
+        Vf_plot = Vf_plot[valid2]
+
+        st.subheader("Voltage Controlled Ideality Factor")
+
+        st.write(f"Average n(V) = {np.mean(nV):.4f}")
+        st.write(f"Minimum n(V) = {np.min(nV):.4f}")
+        st.write(f"Maximum n(V) = {np.max(nV):.4f}")
+
+        fig, ax = plt.subplots(figsize=(8,5))
+
+        ax.plot(
+            Vf_plot,
+            nV,
+            linewidth=2
+        )
+
+        ax.set_xlabel("Voltage (V)")
+        ax.set_ylabel("n(V)")
+        ax.set_title("Voltage Controlled Ideality Factor")
+        ax.grid(True)
+
+        st.pyplot(fig)
+
+        st.session_state["nV"] = nV
+        st.session_state["Vf_plot"] = Vf_plot
+
+
+        # =====================================================
+# EFFECTIVE BARRIER HEIGHT
+# =====================================================
+
+if st.button("Effective Barrier Height"):
+
+    if "nV" not in st.session_state:
+        st.error("Run Voltage Controlled Ideality Factor first")
+    else:
+
+        Phi_B = st.session_state["Phi_B"]
+        Rs = st.session_state["Rs"]
+
+        Vf_plot = st.session_state["Vf_plot"]
+        nV = st.session_state["nV"]
+
+        If = st.session_state["If"]
+
+        If_plot = If[:len(nV)]
+
+        Phi_eff = Phi_B + (
+            1 - 1/nV
+        ) * (
+            Vf_plot - If_plot*Rs
+        )
+
+        valid = np.isfinite(Phi_eff)
+
+        Phi_eff = Phi_eff[valid]
+        Vf_phi = Vf_plot[valid]
+
+        st.subheader("Effective Barrier Height")
+
+        st.write(
+            f"Average Effective Barrier Height = "
+            f"{np.mean(Phi_eff):.4f} eV"
+        )
+
+        fig, ax = plt.subplots(figsize=(8,5))
+
+        ax.plot(
+            Vf_phi,
+            Phi_eff,
+            linewidth=2
+        )
+
+        ax.set_xlabel("Voltage (V)")
+        ax.set_ylabel("Φe (eV)")
+        ax.set_title("Effective Barrier Height")
+        ax.grid(True)
+
+        st.pyplot(fig)
+
+        st.session_state["Phi_eff"] = Phi_eff
+        st.session_state["Vf_phi"] = Vf_phi
