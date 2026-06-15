@@ -218,47 +218,63 @@ if st.button("Run Cheung Part 2"):
         st.write(f"### Barrier Height = {Phi_B:.4f} eV")
         st.write(f"### Intercept = {Intercept2:.4f}")
         st.write(f"### Reverse saturation current Is = {Is:.4e} A")
+        # =====================================
+# Voltage Controlled Ideality Factor
+# =====================================
 
-        # Voltage Controlled Ideality Factor
+        mask_vcif = If < 0.022
 
-        nV = Vf / ((k*T/q) * np.log(If/Is))
+        Vf_fit = Vf[mask_vcif]
+        If_fit = If[mask_vcif]
+
+        nV = Vf_fit / ((k*T/q) * np.log(If_fit/Io))
 
         st.subheader("Voltage Controlled Ideality Factor")
 
         st.write(
         f"Average n(V) = {np.mean(nV):.4f}")
 
-        Phi_eff = Phi_B + (1 - 1/nV)*(Vf - If*Rs)
+        # =====================================
+# Effective Barrier Height
+# =====================================
+
+        Phi_eff = Phi_B + (1 - 1/nV)*(Vf_fit - If_fit*Rs)
 
         st.subheader("Effective Barrier Height")
 
         st.write(
-        f"Average Φe = {np.mean(Phi_eff):.4f} eV")
+        f"Average Effective Barrier Height = {np.mean(Phi_eff):.4f} eV")
 
-        fig1, ax1 = plt.subplots()
+        fig1, ax1 = plt.subplots(figsize=(8,5))
 
-        ax1.plot(Vf, nV)
+        ax1.plot(
+        Vf_fit,
+        nV,
+        linewidth=2)
 
         ax1.set_xlabel("Voltage (V)")
         ax1.set_ylabel("n(V)")
-        ax1.set_title("Voltage Controlled Ideality Factor")
+        ax1.set_title(
+    "Voltage Controlled Ideality Factor")
 
         ax1.grid(True)
 
         st.pyplot(fig1)
 
-        fig2, ax2 = plt.subplots()
+        fig2, ax2 = plt.subplots(figsize=(8,5))
 
-        ax2.plot(Vf, Phi_eff)
+        ax2.plot(
+        Vf_fit,
+        Phi_eff,
+        linewidth=2)
 
         ax2.set_xlabel("Voltage (V)")
-        ax2.set_ylabel("Φe (eV)")
+        ax2.set_ylabel("Effective Barrier Height (eV)")
         ax2.set_title("Effective Barrier Height")
 
         ax2.grid(True)
 
         st.pyplot(fig2)
-                                     
 
         # Plot
 
