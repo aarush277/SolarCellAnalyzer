@@ -3,6 +3,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+import streamlit as st
+
+st.set_page_config(
+    page_title="Solar Cell Analyzer",
+    page_icon="☀️",
+    layout="wide"
+)
+
 st.title("Solar Cell Parameter Extraction Tool")
 
 # Inputs
