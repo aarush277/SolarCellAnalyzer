@@ -437,7 +437,7 @@ if st.button("Interfacial State Density (Nss)"):
         # Energy axis
         q = 1.602e-19
 
-        Ess_minus_Ev = q * (Phi_eff - Vf_phi)
+        Ess_minus_Ev = Phi_eff - Vf_phi
 
         valid = np.isfinite(Nss)
 
