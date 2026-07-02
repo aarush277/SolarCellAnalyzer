@@ -27,12 +27,12 @@ T = st.number_input("Temperature (K)", value=300.0)
 st.subheader("Nss Parameters")
 
 eps_i = st.number_input(
-    "Dielectric Constant of Interfacial Layer",
+    "Dielectric Constant of SiO₂",
     value=3.9
 )
 
 delta_nm = st.number_input(
-    "Interfacial Layer Thickness (nm)",
+    "Oxide Thickness (nm)",
     value=2.0
 )
 
