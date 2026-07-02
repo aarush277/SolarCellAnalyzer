@@ -33,15 +33,15 @@ eps_i = st.number_input(
 
 delta_nm = st.number_input(
     "Oxide Thickness (nm)",
-    value=2.0
-    step=0.0000001
+    value=2.0,
+    step=0.0000001,
     format="%.6f"
 )
 
 Wd_nm = st.number_input(
     "Depletion Width (nm)",
-    value=20.0
-    step=0.0000001
+    value=20.0,
+    step=0.0000001,
     format="%.6f"
 )
 
