@@ -447,32 +447,25 @@ if st.button("Interfacial State Density (Nss)"):
 
         Nss = Nss[valid]
         Ess_minus_Ev = Ess_minus_Ev[valid]
+        Nss_ln = np.log(Nss)
 
         st.subheader("Interfacial State Density")
 
-        st.write(
-            f"Maximum Nss = {np.max(Nss):.3e} cm⁻²eV⁻¹"
-        )
+        st.write(f"Maximum ln(Nss) = {np.max(Nss_ln):.4f}")
+        st.write(f"Minimum ln(Nss) = {np.min(Nss_ln):.4f}")
+        st.write(f"Average ln(Nss) = {np.mean(Nss_ln):.4f}")
 
-        st.write(
-            f"Minimum Nss = {np.min(Nss):.3e} cm⁻²eV⁻¹"
-        )
-
-        st.write(
-            f"Average Nss = {np.mean(Nss):.3e} cm⁻²eV⁻¹"
-        )
+        Nss_ln = np.log(Nss)
 
         fig_nss, ax_nss = plt.subplots(figsize=(8,5))
 
         ax_nss.plot(
             Ess_minus_Ev,
-            Nss,
-            linewidth=2
-        )
-        ax.set_yscale('log')
+            Nss_ln,
+            linewidth=2)
 
         ax_nss.set_xlabel("Ess - Ev (eV)")
-        ax_nss.set_ylabel("Nss (cm⁻² eV⁻¹)")
+        ax_nss.set_ylabel("ln(Nss)")
         ax_nss.set_title("Interfacial State Density")
 
         ax_nss.grid(True)
