@@ -469,6 +469,7 @@ if st.button("Interfacial State Density (Nss)"):
             Nss,
             linewidth=2
         )
+        ax.set_yscale('log')
 
         ax_nss.set_xlabel("Ess - Ev (eV)")
         ax_nss.set_ylabel("Nss (cm⁻² eV⁻¹)")
