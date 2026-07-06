@@ -308,12 +308,16 @@ if st.button("Voltage Controlled Ideality Factor"):
         Is = st.session_state["Is"]
         T = st.session_state["T"]
 
-        ratio = If / Is
+        mask_vcif = (If > 0.001) & (If < 0.022)
 
+        Vf_plot = Vf[mask_vcif]
+        If_plot = If[mask_vcif]
+
+        ratio = If_plot / Is
         valid = ratio > 1.05
 
-        Vf_plot = Vf[valid]
-        If_plot = If[valid]
+        Vf_plot = Vf_plot[valid]
+        If_plot = If_plot[valid]
 
         nV = Vf_plot / (
             (k*T/q) *
@@ -371,7 +375,7 @@ if st.button("Effective Barrier Height"):
         If_plot = If[:len(nV)]
 
         Phi_eff = Phi_B + (1 - 1/nV) * Vf_plot
-        
+
         valid = np.isfinite(Phi_eff)
 
         Phi_eff = Phi_eff[valid]
