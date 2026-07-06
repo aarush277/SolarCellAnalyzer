@@ -453,8 +453,6 @@ if st.button("Interfacial State Density (Nss)"):
 
         st.subheader("Interfacial State Density")
 
-        st.write(f"Maximum ln(Nss) = {np.max(Nss_ln):.4f}")
-        st.write(f"Minimum ln(Nss) = {np.min(Nss_ln):.4f}")
         st.write(f"Average ln(Nss) = {np.mean(Nss_ln):.4f}")
 
 
