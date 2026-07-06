@@ -370,12 +370,8 @@ if st.button("Effective Barrier Height"):
 
         If_plot = If[:len(nV)]
 
-        Phi_eff = Phi_B + (
-            1 - 1/nV
-        ) * (
-            Vf_plot - If_plot*Rs
-        )
-
+        Phi_eff = Phi_B + (1 - 1/nV) * Vf_plot
+        
         valid = np.isfinite(Phi_eff)
 
         Phi_eff = Phi_eff[valid]
