@@ -442,6 +442,8 @@ if st.button("Interfacial State Density (Nss)"):
         q = 1.602e-19
 
         Ess_minus_Ev = Phi_eff - Vf_phi
+        print("Minimum Ess-Ev =", np.min(Ess_minus_Ev))
+        print("Maximum Ess-Ev =", np.max(Ess_minus_Ev))
 
         valid = np.isfinite(Nss)
 
@@ -471,3 +473,6 @@ if st.button("Interfacial State Density (Nss)"):
         ax_nss.grid(True,which="both")
 
         st.pyplot(fig_nss)
+
+        st.write("Maximum Phi_eff =", np.max(Phi_eff))
+        st.write("Maximum Voltage =", np.max(Vf_phi))
