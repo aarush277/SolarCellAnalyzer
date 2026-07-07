@@ -70,6 +70,9 @@ if st.button("Run Cheung Part 1"):
 
         V = data.iloc[:,0].values
         I = data.iloc[:,1].values
+        
+        V_all = V.copy()
+        I_all = I.copy()
 
         # Forward bias region
         idx = V > 0
@@ -255,6 +258,8 @@ if st.button("Run Cheung Part 2"):
 
         st.session_state["Vf"] = Vf
         st.session_state["If"] = If
+        st.session_state["V_all"] = V_all
+        st.session_state["I_all"] = I_all
         st.session_state["Rs"] = Rs1
         st.session_state["Phi_B"] = Phi_B
         st.session_state["Is"] = Is
@@ -303,8 +308,8 @@ if st.button("Voltage Controlled Ideality Factor"):
         q = 1.602e-19
         k = 1.381e-23
 
-        Vf = st.session_state["Vf"]
-        If = st.session_state["If"]
+        Vf = st.session_state["V_all"]
+        If = st.session_state["I_all"]
         Is = st.session_state["Is"]
         T = st.session_state["T"]
 
@@ -312,6 +317,10 @@ if st.button("Voltage Controlled Ideality Factor"):
 
         Vf_plot = Vf[mask_vcif]
         If_plot = If[mask_vcif]
+
+        # Use the complete forward-bias data for Nss
+        Vf_plot = Vf
+        If_plot = If
 
         ratio = If_plot / Is
         valid = ratio > 1.05
