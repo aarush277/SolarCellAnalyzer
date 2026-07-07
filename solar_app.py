@@ -432,9 +432,7 @@ if st.button("Interfacial State Density (Nss)"):
         Wd_cm = Wd_nm * 1e-7
 
         # Capacitance terms
-        Cox = 5.46e-10        # F
-        Ci = Cox / Area       # F/cm²
-        st.write(f"Ci using Cox = {Ci:.3e} F/cm²")
+        Ci = eps_i * eps0 / delta_cm
         Cd = eps_s * eps0 / Wd_cm
 
         # Nss formula from paper
@@ -476,3 +474,4 @@ if st.button("Interfacial State Density (Nss)"):
 
         st.write("Maximum Phi_eff =", np.max(Phi_eff))
         st.write("Maximum Voltage =", np.max(Vf_phi))
+        st.write("Calculated Ci =", Ci)
