@@ -74,6 +74,9 @@ if st.button("Run Cheung Part 1"):
         V_all = V.copy()
         I_all = I.copy()
 
+        st.session_state["V_all"] = V_all
+        st.session_state["I_all"] = I_all
+
         # Forward bias region
         idx = V > 0
 
@@ -258,8 +261,6 @@ if st.button("Run Cheung Part 2"):
 
         st.session_state["Vf"] = Vf
         st.session_state["If"] = If
-        st.session_state["V_all"] = V_all
-        st.session_state["I_all"] = I_all
         st.session_state["Rs"] = Rs1
         st.session_state["Phi_B"] = Phi_B
         st.session_state["Is"] = Is
