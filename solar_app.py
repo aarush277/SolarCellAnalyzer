@@ -308,7 +308,7 @@ if st.button("Voltage Controlled Ideality Factor"):
         Is = st.session_state["Is"]
         T = st.session_state["T"]
 
-        mask_vcif = (If > 0.001) & (If < 0.040)
+        mask_vcif = If > 0
 
         Vf_plot = Vf[mask_vcif]
         If_plot = If[mask_vcif]
