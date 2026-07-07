@@ -432,7 +432,9 @@ if st.button("Interfacial State Density (Nss)"):
         Wd_cm = Wd_nm * 1e-7
 
         # Capacitance terms
-        Ci = eps_i * eps0 / delta_cm
+        Cox = 5.46e-10        # F
+        Ci = Cox / Area       # F/cm²
+        st.write(f"Ci using Cox = {Ci:.3e} F/cm²")
         Cd = eps_s * eps0 / Wd_cm
 
         # Nss formula from paper
