@@ -435,7 +435,9 @@ if st.button("Interfacial State Density (Nss)"):
         # -----------------------------
         # Capacitance terms
         # -----------------------------
-        Ci = eps_i * eps0 / delta_cm
+        Cox = 5.46e-10      # F
+        Area = 0.0078       # cm²
+        Ci = Cox / Area
         Cd = eps_s * eps0 / Wd_cm
 
         # Retrieve complete voltage data
