@@ -172,6 +172,9 @@ if st.button("Run Cheung Part 2"):
         V = data.iloc[:,0].values
         I = data.iloc[:,1].values
 
+        V_all = V.copy()
+        I_all = I.copy()
+
         # Forward bias region
         idx = V > 0
 
@@ -260,6 +263,8 @@ if st.button("Run Cheung Part 2"):
 
         st.session_state["V_all"] = V_all
         st.session_state["I_all"] = I_all
+        st.session_state["Vf"] = Vf
+        st.session_state["If"] = If
         st.session_state["Rs"] = Rs1
         st.session_state["Phi_B"] = Phi_B
         st.session_state["Is"] = Is
@@ -469,10 +474,6 @@ if st.button("Interfacial State Density (Nss)"):
 
         # Remove invalid values
         valid = np.isfinite(Nss) & np.isfinite(Ess_minus_Ev)
-
-        Nss = Nss[valid]
-        Ess_minus_Ev = Ess_minus_Ev[valid]
-
         Nss = Nss[valid]
         Ess_minus_Ev = Ess_minus_Ev[valid]
         Nss_ln = np.log(Nss)
@@ -498,6 +499,6 @@ if st.button("Interfacial State Density (Nss)"):
 
         st.pyplot(fig_nss)
 
-        st.write("Maximum Phi_eff =", np.max(Phi_eff))
+        st.write("Maximum Phi_eff =", np.max(Phi_eff_all))
         st.write("Maximum Voltage =", np.max(Vf_phi))
         st.write("Calculated Ci =",Ci)
