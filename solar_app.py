@@ -327,8 +327,8 @@ if st.button("Voltage Controlled Ideality Factor"):
         T = st.session_state["T"]
 
        # Use all forward-bias points
-        Vf_plot = Vf
-        If_plot = If
+        Vf_plot = Vf_full
+        If_plot = If_full
 
         nV = Vf_plot / (
             (k*T/q) *
