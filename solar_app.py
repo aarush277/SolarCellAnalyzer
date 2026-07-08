@@ -88,10 +88,6 @@ if st.button("Run Cheung Part 1"):
         Vf = Vf[idx2]
         If = If[idx2]
 
-        # ---------- NEW ----------
-        Vf_full = Vf.copy()
-        If_full = If.copy()
-
         # Downsample ONLY for Cheung fitting
         Vf = Vf[::10]
         If = If[::10]
