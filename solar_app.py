@@ -445,32 +445,14 @@ if st.button("Interfacial State Density (Nss)"):
         Phi_B = st.session_state["Phi_B"]
         Vf_phi = st.session_state["Vf_phi"]
         nV = st.session_state["nV"]
+        
 
-        # ------------------------------------
-        # Interpolate n(V) over full voltage
-        # ------------------------------------
-        n_interp = np.interp(
-            V_all,
-            Vf_phi,
-            nV,
-            left=nV[0],
-            right=nV[-1]
-        )
+        Ess_minus_Ev = Phi_eff - Vf_phi
 
-        # ------------------------------------
-        # Effective barrier height
-        # ------------------------------------
-        Phi_eff_all = Phi_B + (1 - 1/n_interp) * V_all
-
-        # ------------------------------------
-        # Energy axis
-        # ------------------------------------
-        Ess_minus_Ev = Phi_eff_all - V_all
-
-        # ------------------------------------
         # Nss
         # ------------------------------------
-        Nss = (Ci*((n_interp-1)/n_interp)-Cd)/q
+     
+        Nss = (Ci * (nV - 1) - Cd) / q
 
         # Remove invalid values
         valid = np.isfinite(Nss) & np.isfinite(Ess_minus_Ev)
@@ -499,6 +481,6 @@ if st.button("Interfacial State Density (Nss)"):
 
         st.pyplot(fig_nss)
 
-        st.write("Maximum Phi_eff =", np.max(Phi_eff_all))
+        st.write("Maximum Phi_eff =", np.max(Phi_eff))
         st.write("Maximum Voltage =", np.max(Vf_phi))
         st.write("Calculated Ci =",Ci)
