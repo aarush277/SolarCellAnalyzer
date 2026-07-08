@@ -313,8 +313,8 @@ if st.button("Voltage Controlled Ideality Factor"):
         q = 1.602e-19
         k = 1.381e-23
 
-        Vf = st.session_state["V_all"]
-        If = st.session_state["I_all"]
+        V_all = st.session_state["V_all"]
+        I_all = st.session_state["I_all"]
         Is = st.session_state["Is"]
         T = st.session_state["T"]
 
