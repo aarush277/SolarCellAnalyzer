@@ -319,20 +319,9 @@ if st.button("Voltage Controlled Ideality Factor"):
         Is = st.session_state["Is"]
         T = st.session_state["T"]
 
-        mask_vcif = If > 0
-
-        Vf_plot = Vf[mask_vcif]
-        If_plot = If[mask_vcif]
-
-        # Use the complete forward-bias data for Nss
+       # Use all forward-bias points
         Vf_plot = Vf
         If_plot = If
-
-        ratio = If_plot / Is
-        valid = ratio > 1.05
-
-        Vf_plot = Vf_plot[valid]
-        If_plot = If_plot[valid]
 
         nV = Vf_plot / (
             (k*T/q) *
@@ -343,6 +332,7 @@ if st.button("Voltage Controlled Ideality Factor"):
 
         nV = nV[valid2]
         Vf_plot = Vf_plot[valid2]
+        If_plot = If_plot[valid2]
 
         st.subheader("Voltage Controlled Ideality Factor")
 
@@ -384,10 +374,6 @@ if st.button("Effective Barrier Height"):
 
         Vf_plot = st.session_state["Vf_plot"]
         nV = st.session_state["nV"]
-
-        If = st.session_state["If"]
-
-        If_plot = If[:len(nV)]
 
         Phi_eff = Phi_B + (1 - 1/nV) * Vf_plot
 
