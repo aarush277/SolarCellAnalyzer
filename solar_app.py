@@ -264,8 +264,8 @@ if st.button("Run Cheung Part 2"):
         st.write(f"### Reverse saturation current Is = {Is:.4e} A")
         # Save values for later use
 
-        st.session_state["Vf"] = Vf_full
-        st.session_state["If"] = If_full
+        st.session_state["V_all"] = V_all
+        st.session_state["I_all"] = I_all
         st.session_state["Rs"] = Rs1
         st.session_state["Phi_B"] = Phi_B
         st.session_state["Is"] = Is
@@ -426,27 +426,58 @@ if st.button("Interfacial State Density (Nss)"):
 
         nV = st.session_state["nV"]
         Phi_eff = st.session_state["Phi_eff"]
-        Vf_phi = st.session_state["Vf_phi"]
+        V_all = st.session_state["V_all"]
+        I_all = st.session_state["I_all"]
 
         # Convert nm → cm
         delta_cm = delta_nm * 1e-7
         Wd_cm = Wd_nm * 1e-7
 
+        # -----------------------------
         # Capacitance terms
+        # -----------------------------
         Ci = eps_i * eps0 / delta_cm
         Cd = eps_s * eps0 / Wd_cm
 
-        # Nss formula from paper
-        Nss = (Ci*(nV - 1) - Cd) / q
+        # Retrieve complete voltage data
+        V_all = st.session_state["V_all"]
 
+        # Retrieve forward-bias results
+        Phi_B = st.session_state["Phi_B"]
+        Vf_phi = st.session_state["Vf_phi"]
+        nV = st.session_state["nV"]
+
+        # ------------------------------------
+        # Interpolate n(V) over full voltage
+        # ------------------------------------
+        n_interp = np.interp(
+            V_all,
+            Vf_phi,
+            nV,
+            left=nV[0],
+            right=nV[-1]
+        )
+
+        # ------------------------------------
+        # Effective barrier height
+        # ------------------------------------
+        Phi_eff_all = Phi_B + (1 - 1/n_interp) * V_all
+
+        # ------------------------------------
         # Energy axis
-        q = 1.602e-19
+        # ------------------------------------
+        Ess_minus_Ev = Phi_eff_all - V_all
 
-        Ess_minus_Ev = Phi_eff - Vf_phi
-        print("Minimum Ess-Ev =", np.min(Ess_minus_Ev))
-        print("Maximum Ess-Ev =", np.max(Ess_minus_Ev))
+        # ------------------------------------
+        # Nss
+        # ------------------------------------
+        Nss = (Ci * (n_interp - 1) - Cd) / q
 
-        valid = np.isfinite(Nss)
+        # Remove invalid values
+        valid = np.isfinite(Nss) & np.isfinite(Ess_minus_Ev)
+
+        Nss = Nss[valid]
+        Ess_minus_Ev = Ess_minus_Ev[valid]
 
         Nss = Nss[valid]
         Ess_minus_Ev = Ess_minus_Ev[valid]
@@ -475,4 +506,4 @@ if st.button("Interfacial State Density (Nss)"):
 
         st.write("Maximum Phi_eff =", np.max(Phi_eff))
         st.write("Maximum Voltage =", np.max(Vf_phi))
-        st.write("Calculated Ci =", Ci)
+        st.write("Calculated Ci =",Ci)
