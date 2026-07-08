@@ -313,21 +313,22 @@ if st.button("Voltage Controlled Ideality Factor"):
         q = 1.602e-19
         k = 1.381e-23
 
-        V_all = st.session_state["V_all"]
-        I_all = st.session_state["I_all"]
+        Vf = st.session_state["Vf"]
+        If = st.session_state["If"]
+
         Is = st.session_state["Is"]
         T = st.session_state["T"]
 
        # Use all forward-bias points
-        Vf_plot = V_all
-        If_plot = I_all
+        Vf_plot = Vf
+        If_plot = If
 
         nV = Vf_plot / (
             (k*T/q) *
             np.log(If_plot/Is)
         )
 
-        valid2 = np.isfinite(nV)
+        valid2 = np.isfinite(nV) & (nV > 0)
 
         nV = nV[valid2]
         Vf_plot = Vf_plot[valid2]
@@ -356,10 +357,6 @@ if st.button("Voltage Controlled Ideality Factor"):
 
         st.session_state["nV"] = nV
         st.session_state["Vf_plot"] = Vf_plot
-
-        st.write("Total Voltage Points =", len(V_all))
-        st.write("Points after VCIF =", len(nV))
-        st.write("Points after filtering =", len(Vf_plot))
 
 
         # =====================================================
@@ -488,7 +485,3 @@ if st.button("Interfacial State Density (Nss)"):
         st.write("Maximum Phi_eff =", np.max(Phi_eff))
         st.write("Maximum Voltage =", np.max(Vf_phi))
         st.write("Calculated Ci =",Ci)
-
-        st.write("Length of Phi_eff =", len(Phi_eff))
-        st.write("Length of Ess-Ev =", len(Ess_minus_Ev))
-        st.write("Length of Nss =", len(Nss))
