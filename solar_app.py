@@ -314,9 +314,20 @@ if st.button("Voltage Controlled Ideality Factor"):
         Is = st.session_state["Is"]
         T = st.session_state["T"]
 
+        mask_vcif = If > 0
+
+        Vf_plot = Vf[mask_vcif]
+        If_plot = If[mask_vcif]
+
         # Use the complete forward-bias data for Nss
         Vf_plot = Vf
         If_plot = If
+
+        ratio = If_plot / Is
+        valid = ratio > 1.05
+
+        Vf_plot = Vf_plot[valid]
+        If_plot = If_plot[valid]
 
         nV = Vf_plot / (
             (k*T/q) *
@@ -327,7 +338,6 @@ if st.button("Voltage Controlled Ideality Factor"):
 
         nV = nV[valid2]
         Vf_plot = Vf_plot[valid2]
-        If_plot = If_plot[valid2]
 
         st.subheader("Voltage Controlled Ideality Factor")
 
