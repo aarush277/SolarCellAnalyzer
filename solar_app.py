@@ -181,6 +181,14 @@ if st.button("Run Cheung Part 2"):
         Vf = V[idx]
         If = I[idx]
 
+
+    # Save complete forward bias data
+        Vf_full = Vf.copy()
+        If_full = If.copy()
+
+        st.session_state["Vf_full"] = Vf_full
+        st.session_state["If_full"] = If_full
+
         # Remove non-positive currents
         idx2 = If > 0
 
@@ -356,6 +364,8 @@ if st.button("Voltage Controlled Ideality Factor"):
 
         st.session_state["nV"] = nV
         st.session_state["Vf_plot"] = Vf_plot
+        st.write("Length of Vf_full =", len(Vf_plot))
+        st.write("Length of nV =", len(nV))
 
         # =====================================================
 # EFFECTIVE BARRIER HEIGHT
