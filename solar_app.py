@@ -357,9 +357,6 @@ if st.button("Voltage Controlled Ideality Factor"):
 
         st.session_state["nV"] = nV
         st.session_state["Vf_plot"] = Vf_plot
-        st.write("Total Voltage Points =", len(V_all))
-        st.write("Points after VCIF =", len(nV))
-        st.write("Points after filtering =", len(Vf_plot))
 
         # =====================================================
 # EFFECTIVE BARRIER HEIGHT
