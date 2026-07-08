@@ -321,8 +321,10 @@ if st.button("Voltage Controlled Ideality Factor"):
         q = 1.602e-19
         k = 1.381e-23
 
-        Vf_plot = st.session_state["Vf_full"]
-        If_plot = st.session_state["If_full"]
+        Vf_full = st.session_state["Vf_full"]
+        If_full = st.session_state["If_full"]
+
+
         Is = st.session_state["Is"]
         T = st.session_state["T"]
 
