@@ -77,7 +77,6 @@ if st.button("Run Cheung Part 1"):
         st.session_state["V_all"] = V_all
         st.session_state["I_all"] = I_all
 
-        # Forward bias region
         idx = V > 0
 
         Vf = V[idx]
@@ -89,7 +88,11 @@ if st.button("Run Cheung Part 1"):
         Vf = Vf[idx2]
         If = If[idx2]
 
-        # Downsample
+        # ---------- NEW ----------
+        Vf_full = Vf.copy()
+        If_full = If.copy()
+
+        # Downsample ONLY for Cheung fitting
         Vf = Vf[::10]
         If = If[::10]
 
@@ -259,8 +262,8 @@ if st.button("Run Cheung Part 2"):
         st.write(f"### Reverse saturation current Is = {Is:.4e} A")
         # Save values for later use
 
-        st.session_state["Vf"] = Vf
-        st.session_state["If"] = If
+        st.session_state["Vf"] = Vf_full
+        st.session_state["If"] = If_full
         st.session_state["Rs"] = Rs1
         st.session_state["Phi_B"] = Phi_B
         st.session_state["Is"] = Is
@@ -309,8 +312,8 @@ if st.button("Voltage Controlled Ideality Factor"):
         q = 1.602e-19
         k = 1.381e-23
 
-        Vf = st.session_state["V_all"]
-        If = st.session_state["I_all"]
+        Vf = st.session_state["Vf"]
+        If = st.session_state["If"]
         Is = st.session_state["Is"]
         T = st.session_state["T"]
 
