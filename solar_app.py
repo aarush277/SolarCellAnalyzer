@@ -454,7 +454,7 @@ if st.button("Interfacial State Density (Nss)"):
         # Nss
         # ------------------------------------
      
-        Nss = ((Ci - Cd) * (nV - 1)) / q
+        Nss = (Ci / q) * (nV - 1 - (Cd / Ci))
         # Remove invalid values
         valid = np.isfinite(Nss) & np.isfinite(Ess_minus_Ev)
         Nss = Nss[valid]
