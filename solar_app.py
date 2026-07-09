@@ -343,6 +343,8 @@ if st.button("Voltage Controlled Ideality Factor"):
         Vf_plot = Vf_plot[valid2]
         If_plot = If_plot[valid2]
 
+        st.session_state["If_plot"] = If_plot
+
         st.subheader("Voltage Controlled Ideality Factor")
 
         st.write(f"Average n(V) = {np.mean(nV):.4f}")
@@ -383,7 +385,7 @@ if st.button("Effective Barrier Height"):
         Rs = st.session_state["Rs"]
 
         Vf_plot = st.session_state["Vf_plot"]
-        If_plot = st.session_state["If_full"]
+        If_plot = st.session_state["If_plot"]
         nV = st.session_state["nV"]
 
         st.write("Length of Vf_plot =", len(Vf_plot))
