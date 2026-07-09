@@ -383,9 +383,10 @@ if st.button("Effective Barrier Height"):
         Rs = st.session_state["Rs"]
 
         Vf_plot = st.session_state["Vf_plot"]
+        If_plot = st.session_state["If_full"]
         nV = st.session_state["nV"]
 
-        Phi_eff = Phi_B + (1 - 1/nV) * Vf_plot
+        Phi_eff = Phi_B + (1 - 1/nV) * (Vf_plot - If_plot * Rs)
 
         valid = np.isfinite(Phi_eff)
 
