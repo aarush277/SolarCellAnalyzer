@@ -331,16 +331,14 @@ if st.button("Voltage Controlled Ideality Factor"):
        # Use all forward-bias points
         Vf_plot = Vf_full
         If_plot = If_full
-
         # Natural logarithm of current
         lnI = np.log(If_plot)
 
         # dV/d(lnI)
         dV_dlnI = np.gradient(Vf_plot, lnI)
 
-        # Voltage Controlled Ideality Factor
-        nV = (q / (k * T)) * (dV_dlnI - If_plot * Rs)
-
+        # Voltage Controlled Ideality Factor (without IRs correction)
+        nV = (q / (k * T)) * dV_dlnI
         valid2 = np.isfinite(nV) & (nV > 0)
 
         nV = nV[valid2]
