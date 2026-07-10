@@ -421,6 +421,10 @@ if st.button("Effective Barrier Height"):
 # INTERFACIAL STATE DENSITY (Nss)
 # =====================================================
 
+# =====================================================
+# INTERFACIAL STATE DENSITY (Nss)
+# =====================================================
+
 if st.button("Interfacial State Density (Nss)"):
 
     if "nV" not in st.session_state:
@@ -432,75 +436,127 @@ if st.button("Interfacial State Density (Nss)"):
     else:
 
         q = 1.602e-19
-        eps0 = 8.854e-14   # F/cm
+        eps0 = 8.854e-14     # F/cm
 
-        nV = st.session_state["nV"]
-        Phi_eff = st.session_state["Phi_eff"]
-        V_all = st.session_state["V_all"]
-        I_all = st.session_state["I_all"]
+        # -----------------------------
+        # User selects number of points
+        # -----------------------------
+        Vf_full = st.session_state["Vf_full"]
+        If_full = st.session_state["If_full"]
 
-        # Convert nm → cm
+        total_points = len(Vf_full)
+
+        nss_points = st.number_input(
+            "Number of Forward Bias Points for NSS",
+            min_value=50,
+            max_value=total_points,
+            value=min(295, total_points),
+            step=1
+        )
+
+        # -----------------------------------
+        # Select evenly spaced forward points
+        # -----------------------------------
+        idx_points = np.linspace(
+            0,
+            total_points - 1,
+            int(nss_points),
+            dtype=int
+        )
+
+        Vf_plot = Vf_full[idx_points]
+        If_plot = If_full[idx_points]
+
+        # -----------------------------------
+        # Retrieve parameters
+        # -----------------------------------
+        Phi_B = st.session_state["Phi_B"]
+        Is = st.session_state["Is"]
+        T = st.session_state["T"]
+
+        eps_i_local = eps_i
+        eps_s_local = eps_s
+
         delta_cm = delta_nm * 1e-7
         Wd_cm = Wd_nm * 1e-7
 
-        # -----------------------------
-        # Capacitance terms
-        # -----------------------------
-        Cox = 5.46e-10      # F
-        Area = 0.0078       # cm²
-        Ci = Cox / Area
-        Cd = eps_s * eps0 / Wd_cm
+        # -----------------------------------
+        # Capacitances
+        # -----------------------------------
+        Ci = eps_i_local * eps0 / delta_cm
+        Cd = eps_s_local * eps0 / Wd_cm
 
-        # Retrieve complete voltage data
-        V_all = st.session_state["V_all"]
+        # -----------------------------------
+        # Voltage Controlled Ideality Factor
+        # -----------------------------------
+        k = 1.381e-23
 
-        # Retrieve forward-bias results
-        Phi_B = st.session_state["Phi_B"]
-        Vf_phi = st.session_state["Vf_phi"]
-        nV = st.session_state["nV"]
-        
+        nV = Vf_plot / (
+            (k * T / q) *
+            np.log(If_plot / Is)
+        )
 
-        Ess_minus_Ev = Phi_eff - Vf_phi
+        valid = np.isfinite(nV) & (nV > 0)
 
+        Vf_plot = Vf_plot[valid]
+        If_plot = If_plot[valid]
+        nV = nV[valid]
+
+        # -----------------------------------
+        # Effective Barrier Height
+        # -----------------------------------
+        Phi_eff = Phi_B + (1 - 1 / nV) * Vf_plot
+
+        # -----------------------------------
+        # Energy
+        # -----------------------------------
+        Ess_minus_Ev = Phi_eff - Vf_plot
+
+        # -----------------------------------
         # Nss
-        # ------------------------------------
-        Nss = ((Ci - Cd) * (nV - 1)) / q
-        # Remove invalid values
-        valid = np.isfinite(Nss) & np.isfinite(Ess_minus_Ev)
+        # -----------------------------------
+        Nss = ((Ci * (nV - 1)) - Cd) / q
+
+        valid = (
+            np.isfinite(Nss)
+            & np.isfinite(Ess_minus_Ev)
+            & (Nss > 0)
+        )
+
         Nss = Nss[valid]
         Ess_minus_Ev = Ess_minus_Ev[valid]
 
-        # Sort by energy (Ess - Ev)
+        # -----------------------------------
+        # Sort
+        # -----------------------------------
         idx = np.argsort(Ess_minus_Ev)
+
         Ess_minus_Ev = Ess_minus_Ev[idx]
         Nss = Nss[idx]
-        
-        Nss_ln = np.log(Nss)
 
-        st.subheader("Interfacial State Density")
+        # -----------------------------------
+        # Plot
+        # -----------------------------------
+        fig, ax = plt.subplots(figsize=(8,5))
 
-        st.write(f"Average ln(Nss) = {np.mean(Nss_ln):.4f}")
-
-
-        fig_nss, ax_nss = plt.subplots(figsize=(8,5))
-
-        ax_nss.plot(
-        Ess_minus_Ev,
-        Nss,
-        linewidth=2
+        ax.plot(
+            Ess_minus_Ev,
+            Nss,
+            linewidth=2
         )
-        ax_nss.set_yscale('log')
-        ax_nss.set_xlabel("Ess - Ev (eV)")
-        ax_nss.set_ylabel("Nss (cm$^{-2}$ eV$^{-1}$)")
-        ax_nss.set_title("Interfacial State Density")
 
-        ax_nss.grid(True,which="both")
+        ax.set_yscale("log")
+        ax.set_xlabel("Ess - Ev (eV)")
+        ax.set_ylabel("Nss (cm$^{-2}$ eV$^{-1}$)")
+        ax.set_title("Interfacial State Density")
+        ax.grid(True, which="both")
 
-        st.pyplot(fig_nss)
+        st.pyplot(fig)
 
-        st.write("Maximum Phi_eff =", np.max(Phi_eff))
-        st.write("Maximum Voltage =", np.max(Vf_phi))
-        st.write("Calculated Ci =",Ci)
-        st.write("Length of Phi_eff =", len(Phi_eff))
-        st.write("Length of Ess-Ev =", len(Ess_minus_Ev))
-        st.write("Length of Nss =", len(Nss))
+        # -----------------------------------
+        # Information
+        # -----------------------------------
+        st.write("Forward bias points used =", len(Vf_plot))
+        st.write("Calculated Ci =", Ci)
+        st.write("Calculated Cd =", Cd)
+        st.write("Average Nss =", np.mean(Nss))
