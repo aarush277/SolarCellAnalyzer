@@ -417,76 +417,57 @@ if st.button("Effective Barrier Height"):
         st.session_state["Phi_eff"] = Phi_eff
         st.session_state["Vf_phi"] = Vf_phi
 
-        # =====================================================
-# INTERFACIAL STATE DENSITY (Nss)
-# =====================================================
-
-# =====================================================
-# INTERFACIAL STATE DENSITY (Nss)
-# =====================================================
+    # =====================================================
+    # INTERFACIAL STATE DENSITY (Nss)
+    # =====================================================
 
 if st.button("Interfacial State Density (Nss)"):
 
-    if "nV" not in st.session_state:
-        st.error("Run Voltage Controlled Ideality Factor first")
-
-    elif "Phi_eff" not in st.session_state:
-        st.error("Run Effective Barrier Height first")
+    if "Vf_full" not in st.session_state:
+        st.error("Run Cheung Part 2 first")
 
     else:
 
         q = 1.602e-19
-        eps0 = 8.854e-14     # F/cm
+        k = 1.381e-23
+        eps0 = 8.854e-14
 
-        # -----------------------------
-        # User selects number of points
-        # -----------------------------
+        # -------------------------
+        # Retrieve saved parameters
+        # -------------------------
         Vf_full = st.session_state["Vf_full"]
         If_full = st.session_state["If_full"]
 
-        total_points = len(Vf_full)
-
-        nss_points = st.number_input(
-            "Number of Forward Bias Points for NSS",
-            min_value=50,
-            max_value=total_points,
-            value=min(295, total_points),
-            step=1
-        )
-
-            
-        # Select first N forward-bias points
-        # -----------------------------------
-        Vf_plot = Vf_full[:int(nss_points)]
-        If_plot = If_full[:int(nss_points)]
-
-        # -----------------------------------
-        # Retrieve parameters
-        # -----------------------------------
         Phi_B = st.session_state["Phi_B"]
         Is = st.session_state["Is"]
         T = st.session_state["T"]
 
-        eps_i_local = eps_i
-        eps_s_local = eps_s
+        # -------------------------
+        # User selects points
+        # -------------------------
+        total_points = len(Vf_full)
 
-        delta_cm = delta_nm * 1e-7
-        Wd_cm = Wd_nm * 1e-7
+        nss_points = st.number_input(
+            "Number of Forward Bias Points",
+            min_value=50,
+            max_value=total_points,
+            value=295,
+            step=1,
+            key="nss_points"
+        )
 
-        # -----------------------------------
-        # Capacitances
-        # -----------------------------------
-        Ci = eps_i_local * eps0 / delta_cm
-        Cd = eps_s_local * eps0 / Wd_cm
+        # -------------------------
+        # First N points
+        # -------------------------
+        Vf_plot = Vf_full[:int(nss_points)]
+        If_plot = If_full[:int(nss_points)]
 
-        # -----------------------------------
+        # -------------------------
         # Voltage Controlled Ideality Factor
-        # -----------------------------------
-        k = 1.381e-23
-
+        # -------------------------
         nV = Vf_plot / (
-            (k * T / q) *
-            np.log(If_plot / Is)
+            (k*T/q) *
+            np.log(If_plot/Is)
         )
 
         valid = np.isfinite(nV) & (nV > 0)
@@ -495,41 +476,44 @@ if st.button("Interfacial State Density (Nss)"):
         If_plot = If_plot[valid]
         nV = nV[valid]
 
-        # -----------------------------------
+        # -------------------------
         # Effective Barrier Height
-        # -----------------------------------
-        Phi_eff = Phi_B + (1 - 1 / nV) * Vf_plot
+        # -------------------------
+        Phi_eff = Phi_B + (1 - 1/nV) * Vf_plot
 
-        # -----------------------------------
+        # -------------------------
         # Energy
-        # -----------------------------------
+        # -------------------------
         Ess_minus_Ev = Phi_eff - Vf_plot
 
-        # -----------------------------------
+        # -------------------------
+        # Capacitances
+        # -------------------------
+        delta_cm = delta_nm * 1e-7
+        Wd_cm = Wd_nm * 1e-7
+
+        Ci = eps_i * eps0 / delta_cm
+        Cd = eps_s * eps0 / Wd_cm
+
+        # -------------------------
         # Nss
-        # -----------------------------------
-        Nss = ((Ci * (nV - 1)) - Cd) / q
+        # -------------------------
+        Nss = (Ci * (nV - 1) - Cd) / q
 
         valid = (
             np.isfinite(Nss)
-            & np.isfinite(Ess_minus_Ev)
-            & (Nss > 0)
+            &
+            np.isfinite(Ess_minus_Ev)
+            &
+            (Nss > 0)
         )
 
         Nss = Nss[valid]
         Ess_minus_Ev = Ess_minus_Ev[valid]
 
-        # -----------------------------------
-        # Sort
-        # -----------------------------------
-        idx = np.argsort(Ess_minus_Ev)
-
-        Ess_minus_Ev = Ess_minus_Ev[idx]
-        Nss = Nss[idx]
-
-        # -----------------------------------
+        # -------------------------
         # Plot
-        # -----------------------------------
+        # -------------------------
         fig, ax = plt.subplots(figsize=(8,5))
 
         ax.plot(
@@ -539,17 +523,14 @@ if st.button("Interfacial State Density (Nss)"):
         )
 
         ax.set_yscale("log")
+
         ax.set_xlabel("Ess - Ev (eV)")
         ax.set_ylabel("Nss (cm$^{-2}$ eV$^{-1}$)")
         ax.set_title("Interfacial State Density")
+
         ax.grid(True, which="both")
 
         st.pyplot(fig)
 
-        # -----------------------------------
-        # Information
-        # -----------------------------------
-        st.write("Forward bias points used =", len(Vf_plot))
-        st.write("Calculated Ci =", Ci)
-        st.write("Calculated Cd =", Cd)
+        st.write("Forward Bias Points Used =", len(Vf_plot))
         st.write("Average Nss =", np.mean(Nss))
