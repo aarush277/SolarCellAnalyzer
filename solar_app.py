@@ -454,18 +454,11 @@ if st.button("Interfacial State Density (Nss)"):
             step=1
         )
 
+            
+        # Select first N forward-bias points
         # -----------------------------------
-        # Select evenly spaced forward points
-        # -----------------------------------
-        idx_points = np.linspace(
-            0,
-            total_points - 1,
-            int(nss_points),
-            dtype=int
-        )
-
-        Vf_plot = Vf_full[idx_points]
-        If_plot = If_full[idx_points]
+        Vf_plot = Vf_full[:int(nss_points)]
+        If_plot = If_full[:int(nss_points)]
 
         # -----------------------------------
         # Retrieve parameters
