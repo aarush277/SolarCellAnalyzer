@@ -417,9 +417,29 @@ if st.button("Effective Barrier Height"):
         st.session_state["Phi_eff"] = Phi_eff
         st.session_state["Vf_phi"] = Vf_phi
 
-    # =====================================================
-    # INTERFACIAL STATE DENSITY (Nss)
-    # =====================================================
+
+        # =====================================================
+# NSS SETTINGS
+# =====================================================
+
+if "Vf_full" in st.session_state:
+
+    total_points = len(st.session_state["Vf_full"])
+
+    st.subheader("NSS Settings")
+
+    nss_points = st.number_input(
+        "Number of Forward Bias Points",
+        min_value=50,
+        max_value=total_points,
+        value=min(295, total_points),
+        step=1,
+        key="nss_points"
+    )
+
+   # =====================================================
+# INTERFACIAL STATE DENSITY (Nss)
+# =====================================================
 
 if st.button("Interfacial State Density (Nss)"):
 
@@ -432,9 +452,7 @@ if st.button("Interfacial State Density (Nss)"):
         k = 1.381e-23
         eps0 = 8.854e-14
 
-        # -------------------------
-        # Retrieve saved parameters
-        # -------------------------
+        # Retrieve saved data
         Vf_full = st.session_state["Vf_full"]
         If_full = st.session_state["If_full"]
 
@@ -442,32 +460,17 @@ if st.button("Interfacial State Density (Nss)"):
         Is = st.session_state["Is"]
         T = st.session_state["T"]
 
-        # -------------------------
-        # User selects points
-        # -------------------------
-        total_points = len(Vf_full)
+        # User selected number of points
+        nss_points = st.session_state["nss_points"]
 
-        nss_points = st.number_input(
-            "Number of Forward Bias Points",
-            min_value=50,
-            max_value=total_points,
-            value=295,
-            step=1,
-            key="nss_points"
-        )
-
-        # -------------------------
-        # First N points
-        # -------------------------
+        # First N forward bias points
         Vf_plot = Vf_full[:int(nss_points)]
         If_plot = If_full[:int(nss_points)]
 
-        # -------------------------
         # Voltage Controlled Ideality Factor
-        # -------------------------
         nV = Vf_plot / (
-            (k*T/q) *
-            np.log(If_plot/Is)
+            (k * T / q) *
+            np.log(If_plot / Is)
         )
 
         valid = np.isfinite(nV) & (nV > 0)
@@ -476,28 +479,21 @@ if st.button("Interfacial State Density (Nss)"):
         If_plot = If_plot[valid]
         nV = nV[valid]
 
-        # -------------------------
         # Effective Barrier Height
-        # -------------------------
-        Phi_eff = Phi_B + (1 - 1/nV) * Vf_plot
+        Phi_eff = Phi_B + (1 - 1 / nV) * Vf_plot
 
-        # -------------------------
         # Energy
-        # -------------------------
         Ess_minus_Ev = Phi_eff - Vf_plot
 
-        # -------------------------
-        # Capacitances
-        # -------------------------
+        # Convert nm to cm
         delta_cm = delta_nm * 1e-7
         Wd_cm = Wd_nm * 1e-7
 
+        # Capacitance terms
         Ci = eps_i * eps0 / delta_cm
         Cd = eps_s * eps0 / Wd_cm
 
-        # -------------------------
         # Nss
-        # -------------------------
         Nss = (Ci * (nV - 1) - Cd) / q
 
         valid = (
@@ -511,9 +507,13 @@ if st.button("Interfacial State Density (Nss)"):
         Nss = Nss[valid]
         Ess_minus_Ev = Ess_minus_Ev[valid]
 
-        # -------------------------
+        # Sort by energy
+        idx = np.argsort(Ess_minus_Ev)
+
+        Ess_minus_Ev = Ess_minus_Ev[idx]
+        Nss = Nss[idx]
+
         # Plot
-        # -------------------------
         fig, ax = plt.subplots(figsize=(8,5))
 
         ax.plot(
@@ -532,5 +532,8 @@ if st.button("Interfacial State Density (Nss)"):
 
         st.pyplot(fig)
 
-        st.write("Forward Bias Points Used =", len(Vf_plot))
+        st.success(f"Using first {len(Vf_plot)} forward bias points")
+
+        st.write("Selected points =", nss_points)
+        st.write("Actual points used =", len(Vf_plot))
         st.write("Average Nss =", np.mean(Nss))
