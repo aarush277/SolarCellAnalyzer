@@ -385,7 +385,7 @@ if st.button("Effective Barrier Height"):
         Vf_plot = st.session_state["Vf_plot"]
         nV = st.session_state["nV"]
 
-        Phi_eff = Phi_B + (1 - 1/nV) * Vf_plot
+        Phi_eff = Phi_B + (1 - 1/nV) * (Vf_plot - If_plot * Rs)
 
         valid = np.isfinite(Phi_eff)
 
@@ -459,6 +459,7 @@ if st.button("Interfacial State Density (Nss)"):
         Phi_B = st.session_state["Phi_B"]
         Is = st.session_state["Is"]
         T = st.session_state["T"]
+        Rs = st.session_state["Rs"]
 
         # User selected number of points
         nss_points = st.session_state["nss_points"]
