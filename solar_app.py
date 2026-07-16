@@ -366,6 +366,7 @@ if st.button("Voltage Controlled Ideality Factor"):
 
         st.session_state["nV"] = nV
         st.session_state["Vf_plot"] = Vf_plot
+        st.session_state["If_plot"] = If_plot
         st.write("Length of Vf_full =", len(Vf_plot))
         st.write("Length of nV =", len(nV))
 
@@ -383,6 +384,7 @@ if st.button("Effective Barrier Height"):
         Rs = st.session_state["Rs"]
 
         Vf_plot = st.session_state["Vf_plot"]
+        If_plot = st.session_state["If_plot"]
         nV = st.session_state["nV"]
 
         Phi_eff = Phi_B + (1 - 1/nV) * (Vf_plot - If_plot * Rs)
@@ -481,7 +483,7 @@ if st.button("Interfacial State Density (Nss)"):
         nV = nV[valid]
 
         # Effective Barrier Height
-        Phi_eff = Phi_B + (1 - 1 / nV) * Vf_plot
+        Phi_eff = Phi_B + (1 - 1/nV) * (Vf_plot - If_plot * Rs)
 
         # Energy
         Ess_minus_Ev = Phi_eff - Vf_plot
